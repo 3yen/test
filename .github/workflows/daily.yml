@@ -2,35 +2,21 @@ name: Daily Post Generator
 
 on:
   schedule:
-    - cron: "0 0 * * *"
-  workflow_dispatch:
+    - cron: "0 0 * * *"   # 毎日（UTC）
+  workflow_dispatch:      # 手動実行OK
+
+permissions:
+  contents: write         # ★push許可
 
 jobs:
   build:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout
+      - name: Checkout repository
         uses: actions/checkout@v4
-
-      - name: Install Ollama
-        run: |
-          curl -fsSL https://ollama.com/install.sh | sh
-          echo "$HOME/.ollama/bin" >> $GITHUB_PATH
-
-      - name: Verify Ollama
-        run: |
-          which ollama || true
-          ollama --version || true
-
-      - name: Start Ollama server
-        run: |
-          ollama serve &
-          sleep 5
-
-      - name: Pull model
-        run: |
-          ollama pull mistral
+        with:
+          fetch-depth: 0   # ★git pull対応
 
       - name: Set up Python
         uses: actions/setup-python@v5
@@ -40,10 +26,18 @@ jobs:
       - name: Generate post
         run: python generate.py
 
-      - name: Commit & Push
+      - name: Generate index
+        run: python generate_index.py
+
+      - name: Commit changes
         run: |
           git config user.name "auto-bot"
           git config user.email "bot@example.com"
           git add .
+
           git commit -m "auto post" || exit 0
-          git push
+
+      - name: Sync & Push
+        run: |
+          git pull --rebase origin main || true
+          git push origin main
