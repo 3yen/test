@@ -1,21 +1,17 @@
-import datetime
 import os
+import datetime
 
 today = datetime.date.today().isoformat()
 
-title = f"今日の自動記事 {today}"
-
-content = f"""# {title}
-
-これはAIで自動生成された記事です。
-
-- 日付: {today}
-- テーマ: 節約・投資・生活改善など
-
-今日も小さく改善することが大事。
-"""
+# ★これ追加（重要）
+os.makedirs("posts", exist_ok=True)
 
 filename = f"posts/{today}.md"
+
+content = f"""# 今日の記事 {today}
+
+これは自動生成された記事です。
+"""
 
 with open(filename, "w", encoding="utf-8") as f:
     f.write(content)
