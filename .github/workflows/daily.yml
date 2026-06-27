@@ -2,18 +2,18 @@ name: Daily Post Generator
 
 on:
   schedule:
-    - cron: "0 0 * * *"  # 毎日9時(JST)
-  workflow_dispatch:
+    - cron: "0 0 * * *"  # 毎日実行（UTC）
+  workflow_dispatch:       # 手動実行ボタンON
 
 jobs:
   build:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout
+      - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Setup Python
+      - name: Set up Python
         uses: actions/setup-python@v5
         with:
           python-version: "3.10"
@@ -21,7 +21,7 @@ jobs:
       - name: Generate post
         run: python generate.py
 
-      - name: Commit & Push
+      - name: Commit & Push changes
         run: |
           git config user.name "auto-bot"
           git config user.email "bot@example.com"
