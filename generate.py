@@ -6,9 +6,19 @@ today = datetime.date.today().isoformat()
 os.makedirs("posts", exist_ok=True)
 
 prompt = """
-日本語でSEOブログ記事を書いてください。
-テーマ：節約・投資・生活改善のどれか
-見出し付きで800文字程度
+あなたはプロの日本語ブログライターです。
+
+テーマは以下からランダムに1つ選んでください：
+- 節約
+- 投資
+- 生活改善
+- 副業
+
+条件：
+- SEOを意識
+- タイトル付き
+- 見出し付き（h2）
+- 800〜1200文字
 """
 
 result = subprocess.run(
@@ -17,7 +27,11 @@ result = subprocess.run(
     text=True
 )
 
-content = result.stdout
+# エラー対策（重要）
+if result.returncode != 0:
+    raise Exception("Ollama failed")
+
+content = result.stdout.strip()
 
 filename = f"posts/{today}.md"
 
